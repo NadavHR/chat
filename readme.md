@@ -16,3 +16,4 @@ json structure:
 how to run:
     * to run the server you need to run the file main_server.py
     * to run an instance of the client you need to run the file main_client.py
+    * if the client loses connection it will reconnect by itself

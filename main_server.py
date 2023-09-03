@@ -93,7 +93,10 @@ def main():
             for sock in wlist:
                 if (sock != current_socket):
                     sock.send(data.encode())
-                    messages_to_send.remove(message)
+                    try:
+                        messages_to_send.remove(message)
+                    except:
+                        pass
             # if current_socket in wlist:
             #     current_socket.send(data.encode())
             #     messages_to_send.remove(message)

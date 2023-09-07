@@ -31,7 +31,7 @@ class recieve_thread (threading.Thread):
 def recv_msg():
     global is_ack
     if (len(uncaught_msgs) == 0):
-        data = json.loads(sock.recv(MAX_MSG_LENGTH).decode()) #sock.recv(1024).decode()
+        data = json.loads(recv(sock).decode()) #sock.recv(1024).decode()
     else:
         data = uncaught_msgs[0]
         del uncaught_msgs[0]
@@ -46,14 +46,14 @@ def send_msg(message: str):
     # else:
     #     l = str(l)
     # msg = l + message
-    sock.sendall((json.dumps({OPCODE: MESSAGE_TO_ALL_OPCODE ,USER_NAME: name, CONTENT: message})).encode())
+    sendall(sock, (json.dumps({OPCODE: MESSAGE_TO_ALL_OPCODE ,USER_NAME: name, CONTENT: message})).encode())
 def send(args: str, opcode: int):
-    sock.sendall((json.dumps({OPCODE: opcode ,USER_NAME: name, CONTENT: args})).encode())
+    sendall(sock, (json.dumps({OPCODE: opcode ,USER_NAME: name, CONTENT: args})).encode())
         
 def health():
     global is_ack
     try:
-        sock.send((json.dumps({OPCODE: HEALTH_OPCODE, USER_NAME: name})).encode())
+        send_to_sock(sock, (json.dumps({OPCODE: HEALTH_OPCODE, USER_NAME: name})).encode())
         # data = json.loads((sock.recv(MAX_MSG_LENGTH)).decode())
         # opcode = data.get(OPCODE, -1)
         # if (opcode == HEALTH_OPCODE):
@@ -113,4 +113,3 @@ def main():
         
 if __name__ == '__main__':
     main()
-    

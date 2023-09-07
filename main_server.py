@@ -26,7 +26,7 @@ def main():
                 client_sockets.append(connection)
             else:
                 try:
-                    data = sock.recv(MAX_MSG_LENGTH).decode()
+                    data = recv(sock).decode()
                     if data == "":
                         print("Connection closed" )
                         client_sockets.remove(sock)
@@ -39,50 +39,50 @@ def main():
                                 if (msg[USER_NAME] not in muted_users):
                                     messages_to_send.append((sock, data))
                                 else:
-                                    sock.send((json.dumps({OPCODE: SERVER_ERROR_OPCODE,
+                                    send_to_sock(sock, (json.dumps({OPCODE: SERVER_ERROR_OPCODE,
                                         CONTENT: f'message "{msg[CONTENT]}" not sent because you are muted'})).encode())
                             elif opcode == HEALTH_OPCODE:
-                                sock.send((json.dumps({OPCODE: HEALTH_OPCODE})).encode())
+                                send_to_sock(sock, (json.dumps({OPCODE: HEALTH_OPCODE})).encode())
                             elif opcode == GIVE_ADMIN_OPCODE:
                                 if msg[USER_NAME] in admin_users:
                                     admin_users.append(msg[CONTENT])
                                 elif msg[CONTENT] in admin_users:
-                                    sock.send((json.dumps({OPCODE: SERVER_ERROR_OPCODE,
+                                    send_to_sock(sock, (json.dumps({OPCODE: SERVER_ERROR_OPCODE,
                                         CONTENT: "user already an admin"})).encode())
                                 else:
-                                    sock.send((json.dumps({OPCODE: SERVER_ERROR_OPCODE,
+                                    send_to_sock(sock, (json.dumps({OPCODE: SERVER_ERROR_OPCODE,
                                         CONTENT: "you can not make someone an admin as you are not an admin yourself"})).encode())
                             elif opcode == REQUEST_ADMIN_OPCODE:
                                 if msg[USER_NAME] in admin_users:
-                                    sock.send((json.dumps({OPCODE: SERVER_ERROR_OPCODE,
+                                    send_to_sock(sock, (json.dumps({OPCODE: SERVER_ERROR_OPCODE,
                                         CONTENT: "you are already an admin"})).encode())
                                 elif msg[CONTENT] == ADMIN_SECRET_PASSWORD:
                                     admin_users.append(msg[USER_NAME])
                                 else:
-                                    sock.send((json.dumps({OPCODE: SERVER_ERROR_OPCODE,
+                                    send_to_sock(sock, (json.dumps({OPCODE: SERVER_ERROR_OPCODE,
                                         CONTENT: "incorrect password"})).encode())
                             elif opcode == MUTE_USER_OPCODE:
                                 if msg[USER_NAME] in admin_users:
                                     if msg[CONTENT] not in muted_users:
                                         muted_users.append(msg[CONTENT])
                                     else:
-                                        sock.send((json.dumps({OPCODE: SERVER_ERROR_OPCODE,
+                                        send_to_sock(sock, (json.dumps({OPCODE: SERVER_ERROR_OPCODE,
                                         CONTENT: "user already muted"})).encode())
                                 else:
-                                    sock.send((json.dumps({OPCODE: SERVER_ERROR_OPCODE,
+                                    send_to_sock(sock, (json.dumps({OPCODE: SERVER_ERROR_OPCODE,
                                         CONTENT: "not an admin"})).encode())
                             elif opcode == UNMUTE_USER_OPCODE:
                                 if msg[USER_NAME] in admin_users:
                                     if msg[CONTENT] in muted_users:
                                         muted_users.remove(msg[CONTENT])
                                     else:
-                                        sock.send((json.dumps({OPCODE: SERVER_ERROR_OPCODE,
+                                        send_to_sock(sock, (json.dumps({OPCODE: SERVER_ERROR_OPCODE,
                                         CONTENT: "user was not muted"})).encode())
                                 else:
-                                    sock.send((json.dumps({OPCODE: SERVER_ERROR_OPCODE,
+                                    send_to_sock(sock, (json.dumps({OPCODE: SERVER_ERROR_OPCODE,
                                         CONTENT: "not an admin"})).encode())
                         except:
-                            sock.send((json.dumps({OPCODE: SERVER_ERROR_OPCODE, CONTENT: "general server error"})).encode())
+                            send_to_sock(sock, (json.dumps({OPCODE: SERVER_ERROR_OPCODE, CONTENT: "general server error"})).encode())
                 except:
                     print("Connection closed" )
                     client_sockets.remove(sock)
@@ -92,7 +92,7 @@ def main():
             current_socket, data = message
             for sock in wlist:
                 if (sock != current_socket):
-                    sock.send(data.encode())
+                    send_to_sock(sock, data.encode())
                     try:
                         messages_to_send.remove(message)
                     except:
@@ -102,4 +102,3 @@ def main():
             #     messages_to_send.remove(message)
 if __name__ == '__main__':
     main()
-    
